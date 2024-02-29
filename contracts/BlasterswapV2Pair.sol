@@ -9,6 +9,7 @@ import './interfaces/IBlasterswapV2Factory.sol';
 import './interfaces/IBlasterswapV2Callee.sol';
 import "./interfaces/IBlast.sol";
 import "./interfaces/IBlastPoints.sol";
+import "./interfaces/IERC20Rebasing.sol";
 
 contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     using SafeMath  for uint;
@@ -29,6 +30,9 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     uint public price1CumulativeLast;
     uint public kLast; // reserve0 * reserve1, as of immediately after the most recent liquidity event
 
+    IERC20Rebasing public constant USDB = IERC20Rebasing(0x4300000000000000000000000000000000000003);
+    IERC20Rebasing public constant WETH = IERC20Rebasing(0x4300000000000000000000000000000000000004);
+
     address public constant blast = 0x4300000000000000000000000000000000000002;
     address public constant blastPoints = 0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800;
     address public constant blastPointsOperator = 0x51Ac425aE5177c81Aa5655d2C01664fd96633B0b;
@@ -42,9 +46,8 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
         unlocked = 1;
     }
 
-    modifier claimYieldAndSync(){
-        IBlast(blast).claimAllYield(address(this), address(this));
-        sync();
+    modifier claimYield(){
+        claimYieldAndUpdate();
         _;
     }
 
@@ -87,7 +90,14 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
 
         IBlast iblast = IBlast(blast);
         iblast.configureClaimableGas();
-        iblast.configureClaimableYield();
+
+        if (token0 == address(USDB) || token1 == address(USDB)) {
+            USDB.configure(IERC20Rebasing.YieldMode.CLAIMABLE);
+        }
+
+        if (token0 == address(WETH) || token1 == address(WETH)) {
+            WETH.configure(IERC20Rebasing.YieldMode.CLAIMABLE);
+        }
 
         governor = _governor;
     }
@@ -130,7 +140,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function mint(address to) external lock claimYieldAndSync returns (uint liquidity) {
+    function mint(address to) external lock claimYield returns (uint liquidity) {
         (uint112 _reserve0, uint112 _reserve1,) = getReserves(); // gas savings
         uint balance0 = IERC20(token0).balanceOf(address(this));
         uint balance1 = IERC20(token1).balanceOf(address(this));
@@ -154,7 +164,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function burn(address to) external lock claimYieldAndSync returns (uint amount0, uint amount1) {
+    function burn(address to) external lock claimYield returns (uint amount0, uint amount1) {
         (uint112 _reserve0, uint112 _reserve1,) = getReserves(); // gas savings
         address _token0 = token0;                                // gas savings
         address _token1 = token1;                                // gas savings
@@ -222,7 +232,30 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
         _update(IERC20(token0).balanceOf(address(this)), IERC20(token1).balanceOf(address(this)), reserve0, reserve1);
     }
 
-    function claimPoolMaxGas() payable external {
+    function claimYieldAndUpdate() internal {
+        uint256 amountClaimedUSDB;
+        uint256 amountClaimedWETH;
+
+        if (token0 == address(USDB) || token1 == address(USDB)) {
+            uint256 claimableAmount = USDB.getClaimableAmount(address(this));
+            amountClaimedUSDB = USDB.claim(address(this), claimableAmount);
+        }
+
+        if (token0 == address(WETH) || token1 == address(WETH)) {
+            uint256 claimableAmount = WETH.getClaimableAmount(address(this));
+            amountClaimedWETH = WETH.claim(address(this), claimableAmount);
+        }
+
+        if (token0==address(USDB)) {
+            _update(reserve0 + amountClaimedUSDB, reserve1 + amountClaimedWETH, reserve0, reserve1);
+        }
+
+        if (token0 == address(WETH)){
+            _update(reserve0 + amountClaimedWETH, reserve1 + amountClaimedUSDB, reserve0, reserve1);
+        }
+    }
+
+    function claimPoolMaxGas() payable lock() external {
         require(msg.sender == governor, 'BlasterswapV2: FORBIDDEN');
         IBlast(blast).claimMaxGas(address(this), governor);
     }
