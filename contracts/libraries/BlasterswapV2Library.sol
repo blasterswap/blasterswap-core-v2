@@ -32,7 +32,7 @@ library BlasterswapV2Library {
                         hex"ff",
                         factory,
                         keccak256(abi.encodePacked(token0, token1)),
-                        hex"5aff5c7030898bee5be6a77a7d5f39bbeb315cab9ee5eb7f0f14e64d2e4a1e72" // init code hash
+                        hex"1b7fe3ac4d592b573b1369300804db10fc966ad39ffc039ea57338d441f4d7e8" // init code hash
                     )
                 )
             )
