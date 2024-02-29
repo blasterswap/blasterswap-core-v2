@@ -30,7 +30,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     uint public kLast; // reserve0 * reserve1, as of immediately after the most recent liquidity event
 
     address public constant blast = 0x4300000000000000000000000000000000000002;
-    address public constant blastPoints = 0x2fc95838c71e76ec69ff817983BFf17c710F34E0;
+    address public constant blastPoints = 0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800;
     address public constant blastPointsOperator = 0x51Ac425aE5177c81Aa5655d2C01664fd96633B0b;
 
     uint private unlocked = 1;
