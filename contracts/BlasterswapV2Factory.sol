@@ -23,7 +23,6 @@ contract BlasterswapV2Factory is IBlasterswapV2Factory {
         uint
     );
 
-    // TODO: store governor as it is in the pair and claimgas
     constructor(address _feeToSetter, address _governor) public {
         require(address(0) != _governor, 'BlasterswapV2: governor is zero address');
         feeToSetter = _feeToSetter;

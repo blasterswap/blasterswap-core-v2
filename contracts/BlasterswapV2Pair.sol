@@ -90,6 +90,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
 
         IBlast iblast = IBlast(blast);
         iblast.configureClaimableGas();
+        iblast.configureGovernor(_governor);
 
         if (token0 == address(USDB) || token1 == address(USDB)) {
             USDB.configure(IERC20Rebasing.YieldMode.CLAIMABLE);
