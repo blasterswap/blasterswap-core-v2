@@ -246,24 +246,22 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
             amountClaimedWETH = WETH.claim(address(this), claimableAmount);
         }
 
-        if (token0==address(USDB) && token1 == address(WETH))  {
-            _update(reserve0 + amountClaimedUSDB, reserve1 + amountClaimedWETH, reserve0, reserve1);
-            return;
-        }
+        uint balance0 = reserve0;
+        uint balance1 = reserve1;
 
         if (token0==address(USDB)) {
-            _update(reserve0 + amountClaimedUSDB, reserve1 + amountClaimedWETH, reserve0, reserve1);
-            return;
-        } else if (token1 == address(USDB)){
-            _update(reserve0 + amountClaimedWETH, reserve1 + amountClaimedUSDB, reserve0, reserve1);
-            return;
+            balance0 += amountClaimedUSDB;
+        } else if (token0 == address(WETH)){
+            balance0 += amountClaimedWETH
         }
 
-        if (token0 == address(WETH)){
-            _update(reserve0 + amountClaimedWETH, reserve1 + amountClaimedUSDB, reserve0, reserve1);
-        } else if (token1==address(WETH)){
-            _update(reserve0 + amountClaimedUSDB, reserve1 + amountClaimedWETH, reserve0, reserve1);
+        if (token1==address(USDB)) {
+            balance1 += amountClaimedUSDB;
+        } else if (token1 == address(WETH)){
+            balance1 += amountClaimedWETH
         }
+
+        _update(balance0, balance1, reserve0, reserve1)
     }
 
     function claimPoolMaxGas() payable lock() external {

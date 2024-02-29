@@ -6,7 +6,13 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-if (process.env.BLAST_MAINNET === undefined || process.env.MNEMONIC === undefined || process.env.RPC_URL === undefined || process.env.BLAST_TEST_RPC === undefined || process.env.ETHERSCAN_API_KEY === undefined) {
+if (
+  process.env.BLAST_MAINNET_RPC === undefined ||
+  process.env.MNEMONIC === undefined ||
+  process.env.RPC_URL === undefined ||
+  process.env.BLAST_TEST_RPC === undefined ||
+  process.env.ETHERSCAN_API_KEY === undefined
+) {
   throw new Error("Please set your MNEMONIC, RPC_URL and ETHERSCAN_API_KEY in a .env file")
 }
 
@@ -55,7 +61,8 @@ const config: HardhatUserConfig = {
     hardhat: {
       forking: {
         url: process.env.BLAST_TEST_RPC,
-        blockNumber: 1778105,
+        // blockNumber: 192980,
+        blockNumber: 2256130
       },
     },
     mumbai: {
@@ -71,9 +78,9 @@ const config: HardhatUserConfig = {
       },
     },
     blast: {
-      url: process.env.BLAST_MAINNET,
+      url: process.env.BLAST_MAINNET_RPC,
       accounts: {
-        mnemonic: process.env.MNEMONIC,
+        mnemonic: process.env.MNEMONIC_MAINNET,
       }
     },
   },
