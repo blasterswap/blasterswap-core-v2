@@ -36,7 +36,6 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     address public constant blast = 0x4300000000000000000000000000000000000002;
     address public constant blastPoints = 0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800;
     address public constant blastPointsOperator = 0x51Ac425aE5177c81Aa5655d2C01664fd96633B0b;
-    address public governor;
 
     uint private unlocked = 1;
     modifier lock() {
@@ -99,8 +98,6 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
         if (token0 == address(WETH) || token1 == address(WETH)) {
             WETH.configure(IERC20Rebasing.YieldMode.CLAIMABLE);
         }
-
-        governor = _governor;
     }
 
     // update reserves and, on the first call per block, price accumulators
@@ -263,10 +260,5 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
         }
 
         _update(balance0, balance1, reserve0, reserve1)
-    }
-
-    function claimPoolMaxGas() payable lock() external {
-        require(msg.sender == governor, 'BlasterswapV2: FORBIDDEN');
-        IBlast(blast).claimMaxGas(address(this), governor);
     }
 }
