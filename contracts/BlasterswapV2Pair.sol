@@ -81,6 +81,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
 
         IBlast iblast = IBlast(blast);
         iblast.configureClaimableGas();
+        iblast.configureAutomaticYield();
         iblast.configureGovernor(_governor);
 
         governor = _governor;
