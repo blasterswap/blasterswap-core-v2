@@ -77,4 +77,5 @@ interface IBlasterswapV2Pair {
     function sync() external;
 
     function initialize(address, address, address) external;
+    function claimPoolMaxGas() payable external;
 }

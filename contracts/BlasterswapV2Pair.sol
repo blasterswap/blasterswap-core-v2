@@ -32,6 +32,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     address public constant blast = 0x4300000000000000000000000000000000000002;
     address public constant blastPoints = 0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800;
     address public constant blastPointsOperator = 0x51Ac425aE5177c81Aa5655d2C01664fd96633B0b;
+    address public constant governor;
 
     uint private unlocked = 1;
     modifier lock() {
@@ -39,6 +40,12 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
         unlocked = 0;
         _;
         unlocked = 1;
+    }
+
+    modifier claimYieldAndSync(){
+        IBlastPoints(blastPoints).claimAllYield(address(this), address(this));
+        sync();
+        _;
     }
 
     function getReserves() public view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast) {
@@ -81,7 +88,8 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
         IBlast iblast = IBlast(blast);
         iblast.configureClaimableGas();
         iblast.configureClaimableYield();
-        iblast.configureGovernor(_governor);
+
+        governor = _governor;
     }
 
     // update reserves and, on the first call per block, price accumulators
@@ -122,7 +130,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function mint(address to) external lock returns (uint liquidity) {
+    function mint(address to) external lock claimYieldAndSync returns (uint liquidity) {
         (uint112 _reserve0, uint112 _reserve1,) = getReserves(); // gas savings
         uint balance0 = IERC20(token0).balanceOf(address(this));
         uint balance1 = IERC20(token1).balanceOf(address(this));
@@ -146,7 +154,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function burn(address to) external lock returns (uint amount0, uint amount1) {
+    function burn(address to) external lock claimYieldAndSync returns (uint amount0, uint amount1) {
         (uint112 _reserve0, uint112 _reserve1,) = getReserves(); // gas savings
         address _token0 = token0;                                // gas savings
         address _token1 = token1;                                // gas savings
@@ -213,4 +221,11 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     function sync() external lock {
         _update(IERC20(token0).balanceOf(address(this)), IERC20(token1).balanceOf(address(this)), reserve0, reserve1);
     }
+
+    function claimPoolMaxGas() payable external {
+        require(msg.sender == governor, 'BlasterswapV2: FORBIDDEN');
+        IBlast(blast).claimMaxGas(address(this), governor);
+    }
+
+    receive() external payable {}
 }
