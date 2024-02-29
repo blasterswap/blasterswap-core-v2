@@ -31,8 +31,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
 
     address public constant blast = 0x4300000000000000000000000000000000000002;
     address public constant blastPoints = 0x2fc95838c71e76ec69ff817983BFf17c710F34E0;
-    address public constant blastPointsOperator = 0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe5;
-    address public governor;
+    address public constant blastPointsOperator = 0x51Ac425aE5177c81Aa5655d2C01664fd96633B0b;
 
     uint private unlocked = 1;
     modifier lock() {
@@ -83,8 +82,6 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
         iblast.configureClaimableGas();
         iblast.configureAutomaticYield();
         iblast.configureGovernor(_governor);
-
-        governor = _governor;
     }
 
     // update reserves and, on the first call per block, price accumulators
@@ -215,10 +212,5 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
     // force reserves to match balances
     function sync() external lock {
         _update(IERC20(token0).balanceOf(address(this)), IERC20(token1).balanceOf(address(this)), reserve0, reserve1);
-    }
-
-    function changePointsOperator(address _operator) external {
-        require(msg.sender == governor, 'BlasterswapV2: FORBIDDEN');
-        IBlastPoints(blastPoints).configurePointsOperator(_operator);
     }
 }
