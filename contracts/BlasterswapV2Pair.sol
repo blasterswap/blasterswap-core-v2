@@ -246,12 +246,18 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
             amountClaimedWETH = WETH.claim(address(this), claimableAmount);
         }
 
-        if (token0==address(USDB)) {
+        if (token0==address(USDB))  {
             _update(reserve0 + amountClaimedUSDB, reserve1 + amountClaimedWETH, reserve0, reserve1);
+            return;
+        } else if (token1 == address(USDB)) {
+            _update(reserve0 + amountClaimedWETH, reserve1 + amountClaimedUSDB, reserve0, reserve1);
+            return;
         }
 
-        if (token0 == address(WETH)){
+        if (token0 == address(WETH) ){
             _update(reserve0 + amountClaimedWETH, reserve1 + amountClaimedUSDB, reserve0, reserve1);
+        } else if (token1==address(WETH) ){
+            _update(reserve0 + amountClaimedUSDB, reserve1 + amountClaimedWETH, reserve0, reserve1);
         }
     }
 
