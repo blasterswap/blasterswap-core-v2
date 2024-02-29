@@ -250,15 +250,15 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
         if (token0==address(USDB)) {
             balance0 += amountClaimedUSDB;
         } else if (token0 == address(WETH)){
-            balance0 += amountClaimedWETH
+            balance0 += amountClaimedWETH;
         }
 
         if (token1==address(USDB)) {
             balance1 += amountClaimedUSDB;
         } else if (token1 == address(WETH)){
-            balance1 += amountClaimedWETH
+            balance1 += amountClaimedWETH;
         }
 
-        _update(balance0, balance1, reserve0, reserve1)
+        _update(balance0, balance1, reserve0, reserve1);
     }
 }
