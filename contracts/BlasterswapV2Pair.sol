@@ -35,7 +35,7 @@ contract BlasterswapV2Pair is IBlasterswapV2Pair, BlasterswapV2ERC20 {
 
     address public constant blast = 0x4300000000000000000000000000000000000002;
     address public constant blastPoints = 0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800;
-    address public constant blastPointsOperator = 0x51Ac425aE5177c81Aa5655d2C01664fd96633B0b;
+    address public constant blastPointsOperator = 0xd94ff4fe12Dd3EA08BE632A5393771CF87808977;
 
     uint private unlocked = 1;
     modifier lock() {
