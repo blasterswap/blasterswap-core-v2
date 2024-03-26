@@ -65,6 +65,12 @@ const config: HardhatUserConfig = {
         blockNumber: 2256130
       },
     },
+    sepolia: {
+      url: process.env.SEPOLIA_RPC_URL,
+      accounts: {
+        mnemonic: process.env.MNEMONIC,
+      }
+    },
     mumbai: {
       url: process.env.RPC_URL,
       accounts: {

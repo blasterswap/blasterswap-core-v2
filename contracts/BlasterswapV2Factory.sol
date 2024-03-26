@@ -14,7 +14,7 @@ contract BlasterswapV2Factory is IBlasterswapV2Factory {
     mapping(address => mapping(address => address)) public getPair;
     address[] public allPairs;
 
-    address public constant blast = 0x4300000000000000000000000000000000000002;
+    // address public constant blast = 0x4300000000000000000000000000000000000002;
 
     event PairCreated(
         address indexed token0,
@@ -28,9 +28,9 @@ contract BlasterswapV2Factory is IBlasterswapV2Factory {
         feeToSetter = _feeToSetter;
         governor = _governor;
 
-        IBlast iblast = IBlast(blast);
-        iblast.configureClaimableGas();
-        iblast.configureGovernor(_governor);
+        // IBlast iblast = IBlast(blast);
+        // iblast.configureClaimableGas();
+        // iblast.configureGovernor(_governor);
     }
 
     function allPairsLength() external view returns (uint) {

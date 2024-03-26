@@ -26,13 +26,13 @@ contract BlasterswapV2Router02 is IBlasterswapV2Router02 {
     }
 
     constructor(address _factory, address _WETH, address _governor) public {
-        require(address(0) != _governor, 'BlasterswapV2: governor is zero address');
+        // require(address(0) != _governor, 'BlasterswapV2: governor is zero address');
         factory = _factory;
         WETH = _WETH;
 
-        IBlast iblast = IBlast(blast);
-        iblast.configureClaimableGas();
-        iblast.configureGovernor(_governor);
+        // IBlast iblast = IBlast(blast);
+        // iblast.configureClaimableGas();
+        // iblast.configureGovernor(_governor);
     }
 
     receive() external payable {
